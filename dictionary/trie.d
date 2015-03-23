@@ -96,7 +96,7 @@ class LoudsBitStringBuilder {
         Queue!Node queue = new Queue!Node();
         queue.append(this.tree);
 
-        while(queue.size() != 0) {
+        while(!queue.isempty) {
             Node node = queue.pop();
             labels ~= node.label;
 

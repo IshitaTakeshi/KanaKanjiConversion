@@ -29,14 +29,14 @@ class Queue(T) {
     /**
     Returns true if the queue is empty.
     */
-    bool isempty() {
-        return this.size() == 0;
+    @property bool isempty() {
+        return this.length == 0;
     }
 
     /**
     Returns the number of items in the queue.
     */
-    ulong size() {
+    @property ulong length() {
         return items.length;
     }
 
