@@ -1,12 +1,12 @@
 import std.conv : to;
 import lib.exception : ValueError;
 
-/*
+/**
 Count 1 bits in x.
 
-Params:
+Parameters:
 n_bits = The size of the counted range in bits. The maximum value is 8.
- */
+*/
 uint countOneBits(int x, uint n_bits) {
     assert(n_bits <= 8);
     x = x & ((1 << n_bits) - 1); //bitmask
@@ -42,9 +42,9 @@ class BitArray {
         this.length = 0;
     }
 
-    /*
-       Push one bit to the bitarray.
-     */
+    /**
+    Push one bit to the bitarray.
+    */
     void push(uint bit)
     in {
         if(!(bit == 0 || bit == 1)) {
@@ -73,7 +73,7 @@ class BitArray {
         assert(error_thrown);
     }
 
-    /*
+    /**
     Get bit at the specified position.
     */
     uint get(uint position)
@@ -142,18 +142,18 @@ class BitArray {
         return bits;
     }
 
-    /*
-       Returns the bitarray.
-     */
+    /**
+    Returns the bitarray.
+    */
     string dump() {
         return to!string(this.bitarray);
     }
 }
 
 
-/*
-   The implementation of succinct bit vector.
- */
+/**
+The implementation of succinct bit vector.
+*/
 class SuccinctBitVector : BitArray {
     //HACK tune the size
     private static immutable uint large_block_size = 1 << 8;
@@ -222,7 +222,7 @@ class SuccinctBitVector : BitArray {
 
     Parameters:
     position = The end point of a counted range in the bitarray.
-     */
+    */
     uint rank0(uint position)
     in {
         assert(this.built);
@@ -236,7 +236,7 @@ class SuccinctBitVector : BitArray {
 
     Parameters:
     position = The end point of a counted range in the bitarray.
-     */
+    */
     uint rank1(uint position)
     in {
         assert(this.built);
@@ -259,9 +259,9 @@ class SuccinctBitVector : BitArray {
         return n_bits;
     }
 
-    /*
-    The basic function of select.
-    */
+    /**
+     * The basic function of select.
+     */
     uint selectBase(uint delegate(uint) rank, uint n)
     out(location) {
         //if select(n) doesn't exist
@@ -296,18 +296,18 @@ class SuccinctBitVector : BitArray {
         return middle+1;
     }
 
-    /*
+    /**
     Return the location of the (n+1)th '0' bit in the bitarray.
     Raise ValueError if select0(n) doesn't exist.
-     */
+    */
     uint select0(uint n) {
         return this.selectBase(&this.rank0, n);
     }
 
-    /*
+    /**
     Return the location of the (n+1)th '1' bit in the bitarray.
     Raise ValueError if select1(n) doesn't exist.
-     */
+    */
     uint select1(uint n) {
         return this.selectBase(&this.rank1, n);
     }

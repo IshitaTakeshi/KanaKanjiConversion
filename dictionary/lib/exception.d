@@ -1,7 +1,7 @@
 module lib.exception;
 
-/*
-    Raised when a function receives an argument that has the right type.
+/**
+Raised when a function receives an argument that has the right type.
 */
 class ValueError : Error {
     this(string msg) {
@@ -10,9 +10,9 @@ class ValueError : Error {
 }
 
 
-/*
-    Raised when a mapping (dictionary) key is not found in the set of existing
-    keys.
+/**
+Raised when a mapping (dictionary) key is not found in the set of existing
+keys. 
 */
 class KeyError : Error {
     this(string msg) {
@@ -21,9 +21,9 @@ class KeyError : Error {
 }
 
 
-/*
-   Raised when a sequence subscript is out of range.
- */
+/**
+Raised when a sequence subscript is out of range.
+*/
 class IndexError : Error {
     this(string msg) {
         super("IndexError:  " ~ msg);

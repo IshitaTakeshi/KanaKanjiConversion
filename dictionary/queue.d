@@ -8,15 +8,15 @@ class Queue(T) {
     T items[];
 
     /**
-     * Insert an item to the queue.
-     */
+    Insert item to the queue.
+    */
     void append(T item) {
         this.items ~= item;
     }
 
     /**
-     * Pick one item and remove it from the queue.
-     */
+    Pick one item and remove it from the queue.
+    */
     T pop() {
         if(this.isempty()) {
             throw new IndexError("The queue is empty.");
@@ -27,15 +27,15 @@ class Queue(T) {
     }
 
     /**
-     * Returns true if the queue is empty.
-     */
+    Returns true if the queue is empty.
+    */
     bool isempty() {
         return this.size() == 0;
     }
 
     /**
-     * Returns the number of items in the queue.
-     */
+    Returns the number of items in the queue.
+    */
     ulong size() {
         return items.length;
     }

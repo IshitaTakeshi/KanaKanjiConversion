@@ -5,9 +5,9 @@ import bitarray : SuccinctBitVector;
 import lib.exception : ValueError, KeyError;
 
 /**
- * The node of the tree.
- * Each node has one character as its member.
- */
+The node of the tree.
+Each node has one character as its member.
+*/
 class Node {
     char label;
     private Node[] children;
@@ -30,10 +30,10 @@ class Node {
 
 
 /**
- * This class has:
- *     A function which constructs a tree by inserted words
- *     A function which dumps the tree as a LOUDS bit-string
- */
+This class has:<br>
+    A function which constructs a tree by inserted words.<br>
+    A function which dumps the tree as a LOUDS bit-string.<br>
+*/
 class LoudsBitStringBuilder {
     private Node tree;
     this(string[] words) {
@@ -45,8 +45,10 @@ class LoudsBitStringBuilder {
         }
     }
 
-    /* Convert words to lower case element-wise and sort them in alphabetical
-     * order.*/
+    /**
+    Convert words to lower case element-wise and sort them in alphabetical
+    order.
+    */
     string[] lower(string[] words) {
         //import std.string : toLower;
         //foreach(ref string word; words) {
@@ -57,7 +59,9 @@ class LoudsBitStringBuilder {
         return words;
     }
 
-    /* Build a tree. */
+    /**
+    Build a tree.
+    */
     private void build(Node node, string word, uint depth) {
         if(depth == word.length) {
             return;
@@ -76,7 +80,9 @@ class LoudsBitStringBuilder {
         return;
     }
 
-    /* Dumps a LOUDS bit-string. */
+    /**
+    Dumps a LOUDS bit-string.
+    */
     Tuple!(SuccinctBitVector, string) dump() {
         //construct a bit vector by Breadth-first search
         SuccinctBitVector bitvector = new SuccinctBitVector();
@@ -153,16 +159,16 @@ unittest {
 }
 
 
-/*
-   Map of words and node numbers with a trie.
- */
+/**
+Map of words and node numbers with a trie.
+*/
 class WordNodeNumberMap {
     private SuccinctBitVector bitvector;
     private string labels;
 
-    /*
-       Build the dictionary.
-       Raise ValueError if the empty string is contained in the words.
+    /**
+    Build the dictionary.
+    Raise ValueError if the empty string is contained in the words.
     */
     this(string[] words)
     in {
@@ -189,9 +195,9 @@ class WordNodeNumberMap {
         assert(error_thrown);
     }
 
-    /*
+    /**
     Return the node number of the child if exists.
-     */
+    */
     private uint traceChildren(uint current_node_number, char character) {
         uint node_number;
 
@@ -212,10 +218,10 @@ class WordNodeNumberMap {
         throw new ValueError("Child not found.");
     }
 
-    /*
-     * Returns the leaf node number if the query exists in the tree and
-     * throws KeyError if not exist.
-     */
+    /**
+    Return the leaf node number if the query exists in the tree and
+    throws KeyError if not exist.
+    */
     uint getNodeNumber(string word)
     in {
         if(word.length == 0) {
@@ -234,7 +240,9 @@ class WordNodeNumberMap {
         return node_number;
     }
 
-    /* Return the word corresponding to the node number. */
+    /**
+    Return the word the associated node number.
+    */
     string getWord(uint node_number)
     in {
         if(node_number >= this.labels.length)  {
@@ -318,9 +326,11 @@ unittest {
 }
 
 
-//TODO try to make only this public
+//TODO try to make only this class public
 //TODO consider the name
-/* Interface of kana-kanji dictionary. */
+/**
+Interface of kana-kanji dictionary.
+*/
 class Dictionary {
     /*
     This is the implementation of a string-to-string dictionary by
@@ -338,7 +348,7 @@ class Dictionary {
             2. Get the node number corresponding to the node number given by
             the key using the associative array.
             3. Extract the value with the node number obtained at 2.
-     */
+    */
 
     private WordNodeNumberMap key_to_node_number;
     private WordNodeNumberMap node_number_to_value;
@@ -374,7 +384,11 @@ class Dictionary {
         this.node_number_map[key_node_number] = value_node_number;
     }
 
-    /* Return the value given the key. */
+    /**
+    Return the value given the key.
+    Content of default_ will be returned if the key doesn't exist among the
+    key set.
+    */
     string get(string key, string default_ = null) {
         string value;
         try {
@@ -389,7 +403,7 @@ class Dictionary {
 }
 
 
-///Example
+///
 unittest {
     auto dictionary = new Dictionary(["Win", "hot"], ["Lose", "cold"]);
     assert(dictionary.get("Win") == "Lose");

@@ -3,15 +3,15 @@ module lib.random.random;  //FIXME the module name is too nested
 import std.random : uniform;
 import lib.exception : ValueError;
 
-/*
+/**
 Returns random numbers from [low, high).
 The random numbers are uniformly distributed.
 
-Params:
+Parameters:
     low = The beginning of the range of the distribution.
     high = The end of the range of the distribution.
     size = The size of the array.
-*/
+ */
 T[] randomArray(T) (T low, T high, ulong size) {
     if(low >= high) {
         throw new ValueError("low >= high");
@@ -24,11 +24,12 @@ T[] randomArray(T) (T low, T high, ulong size) {
     return array;
 }
 
-///Ensure the elements of the array are in the certain range.
+
+///
 unittest {
-    double low = uniform(-1000.0, 100.0);
-    double high = uniform(low+1.0, 1000.0);
-    ulong size = 100000;
+    double low = -100.0;
+    double high = 100.0;
+    ulong size = 20;
 
     auto array = randomArray(low, high, size);
     assert(array.length == size);
@@ -37,11 +38,12 @@ unittest {
     }
 }
 
-///Ensure it also works if the types of the arguments are long.
+
+//Ensure it also works if the types of the arguments are long.
 unittest {
-    long low = uniform(-1000, 100);
-    long high = uniform(low+1, 1000);
-    ulong size = 100000;
+    long low = -100;
+    long high = 100;
+    ulong size = 20;
 
     auto array = randomArray(low, high, size);
     assert(array.length == size);
@@ -49,6 +51,7 @@ unittest {
         assert(low <= e && e < high);
     }
 }
+
 
 //An exception must be thrown if low == high
 unittest {
@@ -61,6 +64,7 @@ unittest {
     //must fail
     assert(failed);
 }
+
 
 //An empty array must be returned when 0 specified to the size.
 unittest {
