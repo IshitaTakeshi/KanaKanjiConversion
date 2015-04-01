@@ -2,7 +2,7 @@ import std.conv : to;
 import lib.exception : ValueError;
 
 /**
-Count 1 bits in x.
+Count 1 bits in x reperesented as binary.
 
 Parameters:
 n_bits = The size of the counted range in bits. The maximum value is 8.
@@ -19,7 +19,7 @@ uint countOneBits(int x, uint n_bits) {
     return x;
 }
 
-
+///
 unittest {
     uint[] bits = [0, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1];
     SuccinctBitVector bitvector = new SuccinctBitVector();
@@ -27,9 +27,21 @@ unittest {
         bitvector.push(bit);
     }
 
+    ///bitvector.bitarray[0] = [0, 1, 1, 0, 1, 1, 0, 0]
+    //countOneBits(bitvector.bitarray[0], 2) should return the number of 1 bits
+    //in [0, 1]
     assert(countOneBits(bitvector.bitarray[0], 2) == 1);
+
+    //countOneBits(bitvector.bitarray[0], 3) should return the number of 1 bits
+    //in [0, 1, 1]
     assert(countOneBits(bitvector.bitarray[0], 3) == 2);
+
+    ///bitvector.bitarray[1] = [1, 0, 0, 0, 0, 0, 0, 1]
+    //countOneBits(bitvector.bitarray[1], 2) should return the number of 1 bits
+    //in [1, 0]
     assert(countOneBits(bitvector.bitarray[1], 2) == 1);
+    //countOneBits(bitvector.bitarray[1], 8) should return the number of 1 bits
+    //in [1, 0, 0, 0, 0, 0, 0, 1]
     assert(countOneBits(bitvector.bitarray[1], 8) == 2);
 }
 
