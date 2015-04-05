@@ -5,6 +5,15 @@ import core.exception : RangeError;
 import parser : MorphemeList, SentenceParser;
 
 
+/**
+Count the number of occurrences of words in a given sentence.
+
+Parameters:
+sentence = the sentence to be analyzed.
+Returns:
+The associative array which keys are the words exist in the sentence and the
+values are the numbers of occurences of associated words.
+*/
 ulong[string] countWordFrequency(string sentence) {
     ulong[string] word_frequency;
 

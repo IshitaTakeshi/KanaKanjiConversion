@@ -9,7 +9,7 @@ import word_class : N_CLASSES, WORD_CLASSES;
 
 //TODO write documentations
 
-/*
+/**
 Assume that we see a sentence "スモモも桃も桃のうち".
 The word classes of the sentence will be like this.
 
@@ -38,8 +38,10 @@ other than word_class_count[11][5] and word_class_count[5][11] are 0.
 alias BIGRAM = ulong[N_CLASSES][N_CLASSES];
 
 
-/* Class to keep a bigram. */
-class Bigram {
+/**
+Class to keep a bigram.
+*/
+class WordClassBigram {
     private BIGRAM word_class_count;
 
     this() {
@@ -49,10 +51,10 @@ class Bigram {
         return this.word_class_count;
     }
 
-    /*
-    Merge another Bigram to this.
-     */
-    void add(Bigram bigram) {
+    /**
+    Merge another WordClassBigram to this.
+    */
+    void opOpAssign(string op)(WordClassBigram bigram) if(op == "~") {
         BIGRAM count = bigram.wordClassCount;
         foreach(int i, ref counts; this.word_class_count) {
             foreach(int j, ref e; counts) {
@@ -61,24 +63,56 @@ class Bigram {
         }
     }
 
+    ///
     unittest {
-        auto builder = new BigramBuilder();
+        auto builder = new WordClassBigramBuilder();
         string sentence = "すもももももももものうち";
-        Bigram bigram1 = builder.parse(sentence);
-        Bigram bigram2 = builder.parse(sentence);
+        WordClassBigram bigram1 = builder.parse(sentence);
+        WordClassBigram bigram2 = builder.parse(sentence);
 
-        bigram1.add(bigram2);
-
-        //import std.stdio;
-        //writeln(bigram1);
         BIGRAM word_class_count;
         word_class_count[11][5] = 6;
         word_class_count[5][11] = 6;
+
+        bigram1 ~= bigram2;
         assert(bigram1.wordClassCount == word_class_count);
     }
 
-    void incrementWordCount(uint current_index, uint next_index) {
+    //TODO explain
+    WordClassBigram opIndexUnary(string op)
+                                (uint current_index, uint next_index)
+                                if(op == "++") {
         this.word_class_count[current_index][next_index] += 1;
+        return this;
+    }
+
+    ///
+    unittest {
+        auto bigram = new WordClassBigram();
+        ++bigram[11, 5];
+        ++bigram[5, 11];
+
+        BIGRAM word_class_count;
+        word_class_count[11][5] = 1;
+        word_class_count[5][11] = 1;
+
+        assert(bigram.wordClassCount == word_class_count);
+    }
+
+    override bool opEquals(Object o) {
+        auto bigram = cast(WordClassBigram)o;
+        return (this.wordClassCount == bigram.wordClassCount);
+    }
+
+    unittest {
+        auto builder = new WordClassBigramBuilder();
+        auto a = builder.parse("すもももももももものうち");
+        auto b = builder.parse("すもももももももものうち");
+        assert(a == b);
+
+        auto c = builder.parse("この先生、きのこる");
+        auto d = builder.parse("この先、生きのこる");
+        assert(c != d);
     }
 
     override string toString() {
@@ -89,6 +123,7 @@ class Bigram {
         for(auto i = 0; i < N_CLASSES; i++) {
             for(auto j = 0; j < N_CLASSES; j++) {
                 auto count = this.word_class_count[i][j];
+                //do not show if the count is 0
                 if(count == 0) {
                     continue;
                 }
@@ -103,24 +138,83 @@ class Bigram {
         }
         return join(lines, "\n");
     }
+
+    void dump(string filename) {
+        import std.stdio : File;
+        import std.array : join;
+        string arrayToLine(ulong[] array) {
+            string line[];
+            foreach(ref e; array) {
+                line ~= e.to!string;
+            }
+            return line.join(",");
+        }
+
+        auto file = File(filename, "w");
+        foreach(array; this.wordClassCount) {
+            file.writeln(arrayToLine(array));
+        }
+        file.close();
+    }
+
+    void load(string filename) {
+        import std.stdio : File;
+        import std.array : split, replace, array;
+        //import std.string : split;
+        import std.algorithm.iteration : map;
+
+        auto file = File(filename, "r");
+
+        auto i = 0;
+        string line = file.readln().replace("\n", "");
+        while(line !is null) {
+            import std.stdio;
+            auto a = array(map!(to!ulong)(line.split(",")));
+            this.word_class_count[i][0..$] = a;
+
+            i += 1;
+            line = file.readln().replace("\n", "");
+        }
+    }
+
+    unittest {
+        auto builder = new WordClassBigramBuilder();
+        auto bigram = new WordClassBigram();
+        auto loader = new WordClassBigram();
+
+        bigram ~= builder.parse("すもももももももものうち");
+        bigram ~= builder.parse("この先生きのこる");
+
+        import std.file : exists, remove;
+
+        string filename = "test.csv";
+        while(exists(filename)) {
+            filename ~= ".test";
+        }
+
+        bigram.dump(filename);
+        loader.load(filename);
+        assert(bigram == loader);
+
+        remove(filename);
+    }
 }
 
 
-
-class BigramBuilder {
+///
+class WordClassBigramBuilder {
     this() {
     }
 
-    /*
-       Parse a sentence and returns a Bigram object.
-       */
-    Bigram parse(string sentence)
+    /**
+    Parse a sentence and returns a WordClassBigram object.
+    */
+    WordClassBigram parse(string sentence)
     body {
         import std.stdio;
-        Bigram bigram = new Bigram();
+        WordClassBigram bigram = new WordClassBigram();
         SentenceParser parser = new SentenceParser();
         MorphemeList morphemes  = parser.parse(sentence);
-
 
         Morpheme previous = null;
         foreach(morpheme; morphemes) {
@@ -131,7 +225,13 @@ class BigramBuilder {
 
             uint p = previous.wordClassIndex;
             uint c = morpheme.wordClassIndex;
-            bigram.incrementWordCount(p, c);
+
+            debug {
+                import std.stdio;
+                writefln("p: %2d  c: %2d  word: %s", p, c, morpheme.word);
+            }
+
+            ++bigram[p, c];
             previous = morpheme;
         }
         return bigram;
@@ -139,8 +239,8 @@ class BigramBuilder {
 
     ///
     unittest {
-        auto builder = new BigramBuilder();
-        Bigram bigram = builder.parse("すもももももももものうち");
+        auto builder = new WordClassBigramBuilder();
+        WordClassBigram bigram = builder.parse("すもももももももものうち");
 
         BIGRAM word_class_count;
         word_class_count[11][5] = 3;
@@ -150,8 +250,8 @@ class BigramBuilder {
     }
 
     unittest {
-        auto builder = new BigramBuilder();
-        Bigram bigram = builder.parse("台湾に行きたいワン");
+        auto builder = new WordClassBigramBuilder();
+        WordClassBigram bigram = builder.parse("台湾に行きたいワン");
 
         BIGRAM word_class_count;
         word_class_count[11][5] = 1;  //名詞 -> 助詞

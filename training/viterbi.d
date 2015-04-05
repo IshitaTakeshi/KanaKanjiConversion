@@ -55,7 +55,7 @@ class Node {
         return this.next_edges;
     }
 
-    bool opEqual(Node node) {
+    override bool opEqual(Node node) {
         return &this == &node;
     }
 }
@@ -68,10 +68,10 @@ void connect(ref Node source, ref Node destination, double cost = 0) {
 }
 
 
+//TODO recursion with memorization
 Tuple!(Node[], double) viterbi(Node source, Node target) {
     if(target == source) {
-        //DEBUG
-        if(0) {
+        debug {
             import std.stdio;
             writefln("target: %s at %x  source: %s at %x",
                      target, &target, source, &source);

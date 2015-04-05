@@ -1,4 +1,6 @@
-//Word classes:
+/**
+The definition of word classes.
+*/
 immutable wchar[][] WORD_CLASSES = [
     "その他",    //0
     "フィラー",  //1
@@ -19,6 +21,9 @@ immutable wchar[][] WORD_CLASSES = [
 immutable ulong N_CLASSES = WORD_CLASSES.length;
 
 
+/**
+Return the index of WORD_CLASSES corresponding posid.
+*/
 uint posidToClassIndex(ushort posid)
 in {
     assert(0 <= posid && posid <= 68);

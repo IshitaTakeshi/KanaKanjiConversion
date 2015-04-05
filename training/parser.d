@@ -15,12 +15,18 @@ class Morpheme {
         this.node = node;
     }
 
+    /**
+    Return a word of a corresponding morpheme.
+    */
     @property string word() {
         import std.conv : to;
         auto length = this.node.length;
         return this.node.surface.to!string[0..length];
     }
 
+    /**
+    Return an index of word_class.WORD_CLASSES.
+    */
     @property uint wordClassIndex() {
         return posidToClassIndex(node.posid);
     }
@@ -34,6 +40,9 @@ class MorphemeList {
         this.bos_node = mecab_sparse_tonode(mecab, sentence.toStringz);
     }
 
+    /**
+    Return an iterative array of Morphemes.
+    */
     int opApply(int delegate(Morpheme) dg) {
         NODE node = bos_node;
         int result;
@@ -76,6 +85,9 @@ class SentenceParser {
         mecab_destroy(this.mecab);
     }
 
+    /**
+    Analyze a sentence and return the result as a MorphemeList object.
+    */
     MorphemeList parse(string sentence) {
         return new MorphemeList(this.mecab, sentence);
     }
