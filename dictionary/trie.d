@@ -1,5 +1,7 @@
 import std.typecons : tuple, Tuple;
 import std.algorithm : reverse, sort, SwapStrategy;
+import std.conv : to;
+
 import queue : Queue;
 import bitarray : SuccinctBitVector;
 import lib.exception : ValueError, KeyError;
@@ -9,11 +11,11 @@ The node of the tree.
 Each node has one character as its member.
 */
 class Node {
-    char label;
+    wchar label;
     private Node[] children;
     bool visited;
 
-    this(char label) {
+    this(wchar label) {
         this.label = label;
         this.children = [];
         this.visited = false;
@@ -37,11 +39,16 @@ This class has:<br>
 class LoudsBitStringBuilder {
     private Node tree;
     this(string[] words) {
+        import std.conv : to;
+        import std.algorithm.iteration : map;
+        import std.array : array;
+
         this.tree = new Node(' ');  //make root
 
         words = this.lower(words);
         foreach(string word; words) {
-            this.build(this.tree, word, 0);
+            wchar[] w = array(map!(to!wchar)(word));
+            this.build(this.tree, w, 0);
         }
     }
 
@@ -62,7 +69,7 @@ class LoudsBitStringBuilder {
     /**
     Build a tree.
     */
-    private void build(Node node, string word, uint depth) {
+    private void build(Node node, wchar[] word, uint depth) {
         if(depth == word.length) {
             return;
         }
@@ -83,15 +90,15 @@ class LoudsBitStringBuilder {
     /**
     Dumps a LOUDS bit-string.
     */
-    Tuple!(SuccinctBitVector, string) dump() {
+    Tuple!(SuccinctBitVector, wchar[]) dump() {
         //construct a bit vector by Breadth-first search
         SuccinctBitVector bitvector = new SuccinctBitVector();
-        string labels;
+        wchar[] labels;
 
         //set the root node
         bitvector.push(1);
         bitvector.push(0);
-        labels = " ";
+        labels ~= cast(wchar)(' ');
 
         Queue!Node queue = new Queue!Node();
         queue.append(this.tree);
@@ -164,7 +171,7 @@ Map of words and node numbers with a trie.
 */
 class WordNodeNumberMap {
     private SuccinctBitVector bitvector;
-    private string labels;
+    private wchar[] labels;
 
     /**
     Build the dictionary.
@@ -198,7 +205,7 @@ class WordNodeNumberMap {
     /**
     Return the node number of the child if exists.
     */
-    private uint traceChildren(uint current_node_number, char character) {
+    private uint traceChildren(uint current_node_number, wchar character) {
         uint node_number;
 
         //get the corresponding index of the node number
@@ -230,7 +237,7 @@ class WordNodeNumberMap {
     }
     body {
         uint node_number = 1;
-        foreach(char character; word) {
+        foreach(wchar character; word) {
             try {
                 node_number = this.traceChildren(node_number, character);
             } catch(ValueError e) {
@@ -250,7 +257,7 @@ class WordNodeNumberMap {
         }
     }
     body {
-        string word = "";
+        wchar[] word;
         //search from the leaf node
         while(node_number != 1) {
             word ~= this.labels[node_number];
@@ -261,9 +268,8 @@ class WordNodeNumberMap {
         }
 
         //reverse the word because searched from the leaf node
-        //TODO determine the type of the word to enable multibyte strings
-        reverse(cast(char[])word);
-        return word;
+        reverse(word);
+        return word.to!string;
     }
 }
 
@@ -354,7 +360,7 @@ class Dictionary {
     private WordNodeNumberMap node_number_to_value;
     //The initial size of the associative array is 0, but will be getting
     //expanded while building.
-    private uint[] node_number_map;
+    private uint[][] node_number_map;
 
     this(string[] keys, string[] values)
     in {
@@ -379,9 +385,9 @@ class Dictionary {
         //expand the associative array
         if(key_node_number >= this.node_number_map.length) {
             ulong size = key_node_number+1-this.node_number_map.length;
-            this.node_number_map ~= new uint[size]; //additional space
+            this.node_number_map ~= new uint[][](size, 0); //additional space
         }
-        this.node_number_map[key_node_number] = value_node_number;
+        this.node_number_map[key_node_number] ~= value_node_number;
     }
 
     /**
@@ -389,16 +395,18 @@ class Dictionary {
     Content of default_ will be returned if the key doesn't exist among the
     key set.
     */
-    string get(string key, string default_ = null) {
-        string value;
+    string[] get(string key) {
+        string[] values;
         try {
             uint key_node_number = this.key_to_node_number.getNodeNumber(key);
-            uint value_node_number = this.node_number_map[key_node_number];
-            value = this.node_number_to_value.getWord(value_node_number);
+            uint[] value_node_numbers = this.node_number_map[key_node_number];
+            foreach(v; value_node_numbers) {
+                values ~= this.node_number_to_value.getWord(v);
+            }
         } catch(KeyError e) {
-            value = default_;
+            return cast(string[])[];
         }
-        return value;
+        return values;
     }
 }
 
@@ -406,19 +414,19 @@ class Dictionary {
 ///
 unittest {
     auto dictionary = new Dictionary(["Win", "hot"], ["Lose", "cold"]);
-    assert(dictionary.get("Win") == "Lose");
-    assert(dictionary.get("won") == null);
-    assert(dictionary.get("won", "lost") == "lost");
+    assert(dictionary.get("Win") == ["Lose"]);
+    assert(dictionary.get("hot") == ["cold"]);
+    assert(dictionary.get("won") == []);
 }
 
 
 //smoke test
 unittest {
     string[] keys = [
-        "Accept", "Affirm", "Include", "Arrive", "Invest",
-        "Begin", "Offer", "Conceal", "Discharge", "Recognize",
-        "Enrich", "Rise", "Expose", "Remember", "Sleep",
-        "Hide", "Sink", "Hurt", "Wax", "accept",
+        "accept", "affirm", "include", "arrive", "invest",
+        "begin", "offer", "conceal", "discharge", "recognize",
+        "enrich", "rise", "expose", "remember", "sleep",
+        "hide", "sink", "hurt", "wax", "accept",
         "affirm", "include", "arrive", "invest", "begin",
         "offer", "conceal", "discharge", "recognize", "enrich",
         "rise", "expose", "remember", "sleep", "hide",
@@ -436,9 +444,39 @@ unittest {
         "wake", "seek", "swim", "heal", "wane"
     ];
 
-    Dictionary dictionary = new Dictionary(keys, values);
+    auto dictionary = new Dictionary(keys, values);
     foreach(uint i, string key; keys) {
-        string value = dictionary.get(key);
-        assert(value == values[i]);
+        assert(dictionary.get(key)[0] == values[i]);
     }
+}
+
+
+//test for multibyte strings
+unittest {
+    string[] keys = [
+        "すもーくちーず"
+    ];
+
+    string[] values = [
+        "スモークチーズ"
+    ];
+
+    auto dictionary = new Dictionary(keys, values);
+    foreach(uint i, string key; keys) {
+        assert(dictionary.get(key)[0] == values[i]);
+    }
+}
+
+//test for duplicate values
+unittest {
+    string[] keys = [
+        "あけます", "あけます", "あけます"
+    ];
+
+    string[] values = [
+        "開けます", "明けます", "空けます"
+    ];
+
+    auto dictionary = new Dictionary(keys, values);
+    assert(dictionary.get("あけます") == values);
 }
