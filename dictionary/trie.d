@@ -45,25 +45,18 @@ class LoudsBitStringBuilder {
 
         this.tree = new Node(' ');  //make root
 
-        words = this.lower(words);
-        foreach(string word; words) {
+        //copy given string array into newly allocated string array
+        //to avoid influencing behavior of words at the outside of
+        //this class
+        string[] words_ = new string[words.length];
+        words_[0..$] = words[0..$];
+
+        //sort words in alphabetical order.
+        sort!("a < b", SwapStrategy.stable)(words_);
+        foreach(string word; words_) {
             wchar[] w = array(map!(to!wchar)(word));
             this.build(this.tree, w, 0);
         }
-    }
-
-    /**
-    Convert words to lower case element-wise and sort them in alphabetical
-    order.
-    */
-    string[] lower(string[] words) {
-        //import std.string : toLower;
-        //foreach(ref string word; words) {
-        //    word = toLower(word);
-        //}
-        //sort words in alphabetical order
-        sort!("a < b", SwapStrategy.stable)(words);
-        return words;
     }
 
     /**
@@ -381,7 +374,6 @@ class Dictionary {
     private void associate_node_numbers(string key, string value) {
         uint key_node_number = this.key_to_node_number.getNodeNumber(key);
         uint value_node_number = this.node_number_to_value.getNodeNumber(value);
-
         //expand the associative array
         if(key_node_number >= this.node_number_map.length) {
             ulong size = key_node_number+1-this.node_number_map.length;
@@ -470,13 +462,17 @@ unittest {
 //test for duplicate values
 unittest {
     string[] keys = [
-        "あけます", "あけます", "あけます"
+        "あけます", "あけます", "あけます",
+        "あけました", "あけました", "あけました"
     ];
 
     string[] values = [
-        "開けます", "明けます", "空けます"
+        "開けます", "明けます", "空けます",
+        "開けました", "明けました", "空けました"
     ];
 
     auto dictionary = new Dictionary(keys, values);
-    assert(dictionary.get("あけます") == values);
+    assert(dictionary.get("あけます") == ["開けます", "明けます", "空けます"]);
+    assert(dictionary.get("あけました") ==
+           ["開けました", "明けました", "空けました"]);
 }
