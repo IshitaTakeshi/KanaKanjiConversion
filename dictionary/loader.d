@@ -32,7 +32,7 @@ struct DictionaryLoader {
     Load key value pairs from files under datadir.
 
     Parameters:
-    datadir : the path to dictionary where dictionary data is in.
+    datadir : the path to a dictionary which dictionary files are in.
     */
     static KEYVALUEPAIRS loadKeyValuePairsFromFiles(string datadir) {
         string[] keys;
@@ -58,7 +58,6 @@ struct DictionaryLoader {
 
 
 unittest {
-    import std.stdio;
     auto dictionary = DictionaryLoader.load("../data_mozc_test");
     assert(dictionary.get("あけます") ==
            ["あけます", "明けます", "空けます"]);
