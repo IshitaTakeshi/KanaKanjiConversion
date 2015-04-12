@@ -5,12 +5,6 @@ import codecs
 from bs4 import BeautifulSoup
 
 
-corpus_dir = './corpus'
-aozorabunko_dir = './aozorabunko'
-
-
-if not(os.path.exists(corpus_dir)):
-    os.makedirs(corpus_dir)
 
 
 def extract_text_from_html(source_path):
@@ -21,6 +15,7 @@ def extract_text_from_html(source_path):
 
     soup = BeautifulSoup(source_text, "html.parser")
 
+    #remove sentences which surrounded by tags below
     soup_ = soup('rt')
     soup_ += soup('rp')
     soup_ += soup('a')
@@ -35,6 +30,7 @@ def extract_text_from_html(source_path):
     return soup.get_text()
 
 
+#returns the iterator of the paths to html files under the aozorabunko_dir
 def html_paths(aozorabunko_dir):
     cards = os.path.join(aozorabunko_dir, 'cards')
     assert(os.path.exists(cards))
@@ -52,7 +48,7 @@ def html_paths(aozorabunko_dir):
             yield path
 
 
-def generate_corpus(aozorabunko_dir, enable_overwrite=False):
+def generate_corpus(aozorabunko_dir, corpus_dir, enable_overwrite=False):
     def source_path_to_text_path(source_path):
         source_filename = os.path.basename(source_path)
         text_path = os.path.join(corpus_dir, source_filename)
@@ -61,6 +57,7 @@ def generate_corpus(aozorabunko_dir, enable_overwrite=False):
         return text_path
 
     for source_path in html_paths(aozorabunko_dir):
+        #rewrite the extension from html to txt
         text_path = source_path_to_text_path(source_path)
 
         if((not enable_overwrite) and os.path.exists(text_path)):
@@ -77,7 +74,13 @@ def generate_corpus(aozorabunko_dir, enable_overwrite=False):
 
 
 
+aozorabunko_dir = './aozorabunko'
+corpus_dir = './corpus'
+
 if(len(sys.argv) >= 2):
     aozorabunko_dir = sys.argv[1]
 
-generate_corpus(aozorabunko_dir)
+if not(os.path.exists(corpus_dir)):
+    os.makedirs(corpus_dir)
+
+generate_corpus(aozorabunko_dir, corpus_dir)
