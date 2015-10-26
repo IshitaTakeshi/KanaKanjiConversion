@@ -57,8 +57,8 @@ struct DictionaryLoader {
 }
 
 
-//unittest {
-//    auto dictionary = DictionaryLoader.load("data_mozc_test");
-//    assert(dictionary["あけます"] ==
-//           ["あけます", "明けます", "空けます"]);
-//}
+unittest {
+    auto dictionary = DictionaryLoader.load("data_mozc_test");
+    assert(dictionary["あけます"] ==
+           ["あけます", "明けます", "空けます"]);
+}
