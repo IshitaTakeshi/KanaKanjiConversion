@@ -1,6 +1,6 @@
-##Setting the environment
+## Setting environment
 
-###Installing MeCab
+### Installing MeCab
 
 ```
 wget http://mecab.googlecode.com/files/mecab-0.996.tar.gz
@@ -11,7 +11,7 @@ make
 sudo make install
 ```
 
-###Installing the IPA dictionary
+### Installing the IPA dictionary
 
 ```
 wget http://mecab.googlecode.com/files/mecab-ipadic-2.7.0-20070801.tar.gz
