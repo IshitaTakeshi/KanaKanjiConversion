@@ -1,9 +1,10 @@
-module path.parser;
-import path.mecab;
+module morphemes.parser;
 
+import std.stdio;
 import std.string : toStringz;
 
-import path.word_class : posidToClassIndex;
+import morphemes.mecab;
+import morphemes.word_class : posidToClassIndex;
 
 
 alias NODE = const(mecab_node_t)*;
@@ -45,8 +46,8 @@ class MorphemeList {
     Return an iterative array of Morphemes.
     */
     int opApply(int delegate(Morpheme) dg) {
-        NODE node = bos_node;
         int result;
+        NODE node = this.bos_node;
 
         //iterate from next of BOS until second to EOS
         node = node.next;
@@ -63,11 +64,20 @@ class MorphemeList {
     ///
     unittest {
         SentenceParser parser = new SentenceParser();
+        //string[] words = ["スモモ", "も", "桃", "も", "桃", "の", "うち"];
+
+        MorphemeList morphemes = parser.parse("");
+        morphemes.toWords();
+    }
+
+    ///
+    unittest {
+        SentenceParser parser = new SentenceParser();
         string[] words = ["スモモ", "も", "桃", "も", "桃", "の", "うち"];
 
-        MorphemeList sentence = parser.parse("スモモも桃も桃のうち");
+        MorphemeList morphemes = parser.parse("スモモも桃も桃のうち");
         auto i = 0;
-        foreach(morpheme; sentence) {
+        foreach(morpheme; morphemes) {
             assert(words[i] == morpheme.word);
             i += 1;
         }
@@ -92,4 +102,23 @@ class SentenceParser {
     MorphemeList parse(string sentence) {
         return new MorphemeList(this.mecab, sentence);
     }
+}
+
+
+string[] toWords(MorphemeList morphemes) {
+    string[] words;
+
+    foreach(morpheme; morphemes) {
+        words ~= morpheme.word;
+    }
+    return words;
+}
+
+
+unittest {
+    string sentence = "すもももももももものうち";
+    MorphemeList morphemes = new SentenceParser().parse(sentence);
+    string[] words = morphemes.toWords();
+    string[] result = ["すもも", "も", "もも", "も", "もも", "の", "うち"];
+    assert(words == result);
 }

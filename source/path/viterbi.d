@@ -81,11 +81,6 @@ void connect(ref Node source, ref Node destination, double cost = 0) {
 //TODO recursion with memorization
 Tuple!(Node[], double) viterbi(Node source, Node target) {
     if(target == source) {
-        debug {
-            import std.stdio;
-            writefln("target: %s at %x  source: %s at %x",
-                     target, &target, source, &source);
-        }
         return tuple([source], source.cost);
     }
 

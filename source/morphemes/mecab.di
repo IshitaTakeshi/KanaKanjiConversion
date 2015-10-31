@@ -1,5 +1,5 @@
 
-module path.mecab;
+module morphemes.mecab;
 
 __gshared extern(C) nothrow @nogc:
 

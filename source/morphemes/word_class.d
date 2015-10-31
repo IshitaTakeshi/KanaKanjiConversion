@@ -1,4 +1,4 @@
-module path.word_class;
+module morphemes.word_class;
 
 /**
 The definition of word classes.

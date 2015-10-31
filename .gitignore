@@ -3,3 +3,9 @@ docs.json
 __dummy.html
 *.o
 *.obj
+*.swp
+
+kanakanjiconversion
+libkanakanjiconversion.a
+__test__library__
+jawiki*.xml*
