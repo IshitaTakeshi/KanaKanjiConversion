@@ -5,32 +5,29 @@ import std.conv : to;
 import core.exception : RangeError;
 
 import morphemes.parser : MorphemeList, SentenceParser, toWords;
-
-/**
-Count the number of occurrences of words in a given sentence.
-
-Parameters:
-sentence = the sentence to be analyzed.
-Returns:
-The associative array which keys are the words exist in the sentence and the
-values are the numbers of occurences of associated words.
-*/
+import lm.languagemodel : WordFrequency;
 
 
 alias Count = ulong[string];
 
 
-class Occurrence {
+/**
+Count the number of occurrences of words in a given sentence.
+*/
+class Occurrence : WordFrequency {
     //occurence[word] keeps how many times word found
     private Count occurence;
 
-    //sentence: a list of words which forms a sentence
+    /// sentence: a list of words which forms a sentence
     void update(string[] sentence) {
         foreach(word; sentence) {
             this.occurence[word] += 1;
         }
     }
 
+    ///Returns:
+    ///The associative array which keys are the words found in the sentence and
+    ///the values are the numbers of occurences of associated words.
     Count dump() {
         return this.occurence;
     }

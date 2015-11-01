@@ -63,9 +63,8 @@ class MorphemeList {
 
     ///
     unittest {
+        // nothing should happen even if parsing empty string
         SentenceParser parser = new SentenceParser();
-        //string[] words = ["スモモ", "も", "桃", "も", "桃", "の", "うち"];
-
         MorphemeList morphemes = parser.parse("");
         morphemes.toWords();
     }

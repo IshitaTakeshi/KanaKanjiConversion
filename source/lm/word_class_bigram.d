@@ -11,7 +11,7 @@ import core.exception : RangeError;
 
 import morphemes.parser : SentenceParser, MorphemeList, Morpheme;
 import morphemes.word_class : N_CLASSES, WORD_CLASSES;
-import lm.abstractbigram : AbstractBigram, AbstractBigramBuilder;
+import lm.languagemodel : Bigram, BigramBuilder;
 
 //TODO write documentations
 
@@ -47,10 +47,10 @@ alias Count = ulong[N_CLASSES][N_CLASSES];
 /**
 Class to keep a bigram.
 */
-class WordClassBigram : AbstractBigram {
+class WordClassBigram : Bigram {
     private Count word_class_count;
 
-    @property Count dump() {
+    Count dump() {
         return this.word_class_count;
     }
 
@@ -152,7 +152,7 @@ class WordClassBigram : AbstractBigram {
 
 
 ///
-class WordClassBigramBuilder : AbstractBigramBuilder {
+class WordClassBigramBuilder : BigramBuilder {
     WordClassBigram bigram;
 
     this() {

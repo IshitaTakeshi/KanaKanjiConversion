@@ -1,14 +1,15 @@
-module lm.bigram;
+module lm.word_bigram;
 
 import std.stdio;
+import std.conv : to;
 
-import lm.abstractbigram : AbstractBigram, AbstractBigramBuilder;
+import lm.languagemodel : Bigram, BigramBuilder;
 
 
 alias Count = ulong[string][string];
 
 
-class Bigram : AbstractBigram {
+class WordBigram : Bigram {
     Count bigram;
 
     this() {
@@ -21,18 +22,27 @@ class Bigram : AbstractBigram {
     void update(string current_word, string next_word) {
         this.bigram[current_word][next_word] += 1;
     }
+
+    override bool opEquals(Object o) {
+        auto bigram = cast(WordBigram)o;
+        return (this.dump() == bigram.dump());
+    }
+
+    override string toString() {
+        return to!string(this.bigram);
+    }
 }
 
 
-class BigramBuilder : AbstractBigramBuilder {
-    Bigram bigram;
+class WordBigramBuilder : BigramBuilder {
+    WordBigram bigram;
 
     this() {
-        this.bigram = new Bigram();
+        this.bigram = new WordBigram();
     }
 
     void update(string[] words) {
-        auto bigram = new Bigram();
+        auto bigram = new WordBigram();
         for(int i = 0; i < words.length-1; i++) {
             string current = words[i];
             string next = words[i+1];
@@ -40,7 +50,7 @@ class BigramBuilder : AbstractBigramBuilder {
         }
     }
 
-    Bigram build() {
+    WordBigram build() {
         return this.bigram;
     }
 }
@@ -48,9 +58,9 @@ class BigramBuilder : AbstractBigramBuilder {
 unittest {
     string[] words = ["すもも", "も", "もも", "も", "もも", "の", "うち"];
 
-    auto builder = new BigramBuilder();
+    auto builder = new WordBigramBuilder();
     builder.update(words);
-    Bigram bigram = builder.build();
+    WordBigram bigram = builder.build();
 
     Count count;
     count["すもも"]["も"] += 1;
