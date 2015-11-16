@@ -7,13 +7,13 @@ import morphemes.mecab;
 import morphemes.word_class : posidToClassIndex;
 
 
-alias NODE = const(mecab_node_t)*;
+alias Node = const(mecab_node_t)*;
 
 
 class Morpheme {
-    private const NODE node;
+    private const Node node;
 
-    this(NODE node) {
+    this(Node node) {
         this.node = node;
     }
 
@@ -36,7 +36,7 @@ class Morpheme {
 
 
 class MorphemeList {
-    private NODE bos_node;
+    private Node bos_node;
 
     this(mecab_t* mecab, string sentence) {
         this.bos_node = mecab_sparse_tonode(mecab, sentence.toStringz);
@@ -47,7 +47,7 @@ class MorphemeList {
     */
     int opApply(int delegate(Morpheme) dg) {
         int result;
-        NODE node = this.bos_node;
+        Node node = this.bos_node;
 
         //iterate from next of BOS until second to EOS
         node = node.next;
