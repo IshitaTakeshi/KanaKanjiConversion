@@ -3,8 +3,8 @@
 	"description": "A Basic Input Method",
 	"copyright": "Copyright © 2015, sonicair",
 	"authors": ["Ishita Takeshi"],
-	"dependencies": {
+    "dependencies": {
         "dtrie": "~master"
-	},
+    },
     "lflags": ["-lmecab"]
 }
