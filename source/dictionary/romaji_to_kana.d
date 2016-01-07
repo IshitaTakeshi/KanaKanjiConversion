@@ -55,5 +55,5 @@ class RomajiKanaConverter {
 unittest {
     auto converter = new RomajiKanaConverter();
     string katakana = converter.convert("orehaninngenngasukida");
-    writeln("おれはにんげんがすきだ");
+    assert("おれはにんげんがすきだ" == katakana);
 }
